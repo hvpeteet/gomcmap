@@ -1,6 +1,7 @@
 package mcmap
 
 import (
+	"errors"
 	"github.com/kch42/gonbt/nbt"
 )
 
@@ -396,10 +397,29 @@ var blockNames = map[BlockID]string{
 	BlkSeaLantern:                 "Sea Lantern",
 }
 
+var blockIDLookupTable = map[string]BlockID{}
+
 func (b BlockID) String() string {
 	if s, ok := blockNames[b]; ok {
 		return s
 	}
 
 	return "(unused)"
+}
+
+func initBlockLookupTable() {
+	for k, v := range blockNames {
+		blockIDLookupTable[v] = k
+	}
+}
+
+func BlockIDFromString(b string) (BlockID, error) {
+	if len(blockIDLookupTable) == 0 {
+		initBlockLookupTable()
+	}
+	id, ok := blockIDLookupTable[b]
+	if !ok {
+		return id, errors.New("No found block ID")
+	}
+	return id, nil
 }
